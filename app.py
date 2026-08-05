@@ -193,6 +193,31 @@ def update_status(ticket_id):
     return redirect(url_for("view_ticket", ticket_id=ticket_id))
 
 
+@app.route("/tickets/<int:ticket_id>/delete", methods=["POST"])
+def delete_ticket(ticket_id):
+    """Delete a ticket and all its messages."""
+    ensure_tables()
+    
+    try:
+        # First delete all messages for this ticket
+        lakebase.run_write(
+            "DELETE FROM ticket_messages WHERE ticket_id = %s",
+            (ticket_id,),
+        )
+        
+        # Then delete the ticket itself
+        lakebase.run_write(
+            "DELETE FROM tickets WHERE ticket_id = %s",
+            (ticket_id,),
+        )
+        
+        logger.info(f"Deleted ticket {ticket_id} and its messages")
+        return redirect(url_for("index"))
+    except Exception as e:
+        logger.exception(f"Failed to delete ticket {ticket_id}")
+        return jsonify({"error": f"Failed to delete ticket: {str(e)}"}), 500
+
+
 if __name__ == '__main__':
     host = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
     port = int(os.getenv('FLASK_RUN_PORT', 8000))
