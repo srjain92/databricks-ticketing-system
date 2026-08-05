@@ -62,8 +62,21 @@ def handle_exception(err):
 
 @app.route("/")
 def index():
-    """Simple UI to submit a list of stock symbols to sync from Massive."""
-    return render_template("index.html")
+    """Main page showing all tickets."""
+    ensure_tables()
+    
+    # Get all tickets
+    tickets = lakebase.run_query(
+        "SELECT ticket_id, title, status, created_by, created_at "
+        "FROM tickets ORDER BY created_at DESC"
+    )
+    
+    return render_template(
+        "tickets.html",
+        tickets=tickets,
+        selected_ticket=None,
+        messages=[],
+    )
 
 
 @app.route("/tickets", methods=["POST"])
