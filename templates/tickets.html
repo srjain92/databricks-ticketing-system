@@ -312,16 +312,21 @@
         {% if selected_ticket %}
             <div class="ticket-header">
                 <div class="ticket-title">{{ selected_ticket['title'] }}</div>
-                <form class="status-selector" action="/tickets/{{ selected_ticket['ticket_id'] }}/status" method="POST">
-                    <label>Status:</label>
-                    <select name="status">
-                        <option value="open" {% if selected_ticket['status'] == 'open' %}selected{% endif %}>Open</option>
-                        <option value="in_progress" {% if selected_ticket['status'] == 'in_progress' %}selected{% endif %}>In Progress</option>
-                        <option value="resolved" {% if selected_ticket['status'] == 'resolved' %}selected{% endif %}>Resolved</option>
-                        <option value="closed" {% if selected_ticket['status'] == 'closed' %}selected{% endif %}>Closed</option>
-                    </select>
-                    <button type="submit">Update</button>
-                </form>
+                <div style="display: flex; align-items: center;">
+                    <form class="status-selector" action="/tickets/{{ selected_ticket['ticket_id'] }}/status" method="POST">
+                        <label>Status:</label>
+                        <select name="status">
+                            <option value="open" {% if selected_ticket['status'] == 'open' %}selected{% endif %}>Open</option>
+                            <option value="in_progress" {% if selected_ticket['status'] == 'in_progress' %}selected{% endif %}>In Progress</option>
+                            <option value="resolved" {% if selected_ticket['status'] == 'resolved' %}selected{% endif %}>Resolved</option>
+                            <option value="closed" {% if selected_ticket['status'] == 'closed' %}selected{% endif %}>Closed</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                    <form id="deleteForm-{{ selected_ticket['ticket_id'] }}" action="/tickets/{{ selected_ticket['ticket_id'] }}/delete" method="POST" style="margin: 0;">
+                        <button type="button" class="delete-btn" onclick="confirmDelete({{ selected_ticket['ticket_id'] }})">Delete</button>
+                    </form>
+                </div>
             </div>
             <div class="ticket-meta">
                 Created by {{ selected_ticket['created_by'] }} on {{ selected_ticket['created_at'].strftime('%B %d, %Y at %I:%M %p') }}
