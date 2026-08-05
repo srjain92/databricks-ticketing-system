@@ -249,7 +249,7 @@
         </div>
         <div class="ticket-list">
             {% for ticket in tickets %}
-            <a href="/tickets/{{ ticket['ticket_id'] }}" 
+            <a href="/tickets/{{ ticket['ticket_id'] }}?status={{ status_filter }}" 
                class="ticket-item {% if selected_ticket and selected_ticket['ticket_id'] == ticket['ticket_id'] %}active{% endif %}">
                 <div class="ticket-item-title">{{ ticket['title'] }}</div>
                 <div class="ticket-item-meta">

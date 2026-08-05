@@ -65,17 +65,28 @@ def index():
     """Main page showing all tickets."""
     ensure_tables()
     
-    # Get all tickets
-    tickets = lakebase.run_query(
-        "SELECT ticket_id, title, status, created_by, created_at "
-        "FROM tickets ORDER BY created_at DESC"
-    )
+    # Get status filter from query parameter
+    status_filter = request.args.get("status", "all")
+    
+    # Build query based on filter
+    if status_filter == "all":
+        tickets = lakebase.run_query(
+            "SELECT ticket_id, title, status, created_by, created_at "
+            "FROM tickets ORDER BY created_at DESC"
+        )
+    else:
+        tickets = lakebase.run_query(
+            "SELECT ticket_id, title, status, created_by, created_at "
+            "FROM tickets WHERE status = %s ORDER BY created_at DESC",
+            (status_filter,)
+        )
     
     return render_template(
         "tickets.html",
         tickets=tickets,
         selected_ticket=None,
         messages=[],
+        status_filter=status_filter,
     )
 
 
@@ -102,11 +113,21 @@ def view_ticket(ticket_id):
     """View a specific ticket with all its messages."""
     ensure_tables()
     
-    # Get all tickets for the sidebar
-    tickets = lakebase.run_query(
-        "SELECT ticket_id, title, status, created_by, created_at "
-        "FROM tickets ORDER BY created_at DESC"
-    )
+    # Get status filter from query parameter
+    status_filter = request.args.get("status", "all")
+    
+    # Get tickets for the sidebar (filtered)
+    if status_filter == "all":
+        tickets = lakebase.run_query(
+            "SELECT ticket_id, title, status, created_by, created_at "
+            "FROM tickets ORDER BY created_at DESC"
+        )
+    else:
+        tickets = lakebase.run_query(
+            "SELECT ticket_id, title, status, created_by, created_at "
+            "FROM tickets WHERE status = %s ORDER BY created_at DESC",
+            (status_filter,)
+        )
     
     # Get the selected ticket
     selected_ticket_rows = lakebase.run_query(
@@ -132,6 +153,7 @@ def view_ticket(ticket_id):
         tickets=tickets,
         selected_ticket=selected_ticket,
         messages=messages,
+        status_filter=status_filter,
     )
 
 
